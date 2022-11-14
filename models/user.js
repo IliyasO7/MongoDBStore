@@ -39,6 +39,8 @@ class User{
     const db = getDb();
     return db.collection('users').updateOne({_id: new ObejctId(this._id)}, {$set:{cart: updatedCart}})
   }
+
+
   getCart(){
     const db = getDb();
     const productIds = this.cart.items.map(i =>{
@@ -76,6 +78,50 @@ class User{
     
 
   }
+
+
+  addOrder(){
+    const db =getDb();
+   return this.getCart().then(products=>{
+      const order = {
+        items : products,
+        user: {
+          _id: new ObejctId(this._id),
+          name: this.name
+        }
+  
+      };
+      return db.collection('orders').insertOne(order);
+    })
+    .then(result=>{
+      this.cart = {items: []};
+
+      return db.collection('users').updateOne({_id: new ObejctId(this._id)}, {$set:{cart:{items:[]} }})
+
+
+
+      
+    })
+    
+  }
+
+  getOrders(){
+    const db = getDb();
+
+    return db.collection('orders').find({'user._id': new mongodb.ObjectId(this._id)}).toArray();
+
+  }
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
