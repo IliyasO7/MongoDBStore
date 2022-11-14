@@ -16,8 +16,8 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title,price,description,imageUrl)
-    product.save()
+  const product = new Product(title,price,description,imageUrl,null,req.user._id) //while retriveing object is converted to string
+    product.save()                          //embedding of which user is creating a ppreduct realtions
     .then(result => {
       // console.log(result);
       console.log('Created Product');
