@@ -18,6 +18,11 @@ const productSchema = new Schema({
   imageUrl: {
     type: String,
     required: true
+  },
+  userId:{
+    type:Schema.Types.ObjectId,
+    ref: 'User', //realte the model which to relate
+    required:true
   }
   //_id would be defined auto
 

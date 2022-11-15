@@ -16,7 +16,9 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product({title:title,price:price,description:description,imageUrl:imageUrl}) //while retriveing object is converted to string
+
+
+  const product = new Product({title:title,price:price,description:description,imageUrl:imageUrl,userId:req.user}) //while retriveing object is converted to string
     product.save()  //save defined by mongoose                         //embedding of which user is creating a ppreduct realtions
     .then(result => {
       // console.log(result);
@@ -28,11 +30,15 @@ exports.postAddProduct = (req, res, next) => {
     });
 };
 
+
+
 exports.getProducts = (req, res, next) => {
   //req.user
   //  .getProducts()
-  Product.find()
+  Product.find() /* .select('title price -_id').populate('userId', 'name')  */ //pop tell momgoose to populate all the dbs and not theid just
     .then(products => {
+
+      console.log(products);
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
