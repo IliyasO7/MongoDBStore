@@ -16,8 +16,8 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title,price,description,imageUrl,null,req.user._id) //while retriveing object is converted to string
-    product.save()                          //embedding of which user is creating a ppreduct realtions
+  const product = new Product({title:title,price:price,description:description,imageUrl:imageUrl}) //while retriveing object is converted to string
+    product.save()  //save defined by mongoose                         //embedding of which user is creating a ppreduct realtions
     .then(result => {
       // console.log(result);
       console.log('Created Product');
@@ -31,7 +31,7 @@ exports.postAddProduct = (req, res, next) => {
 exports.getProducts = (req, res, next) => {
   //req.user
   //  .getProducts()
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       res.render('admin/products', {
         prods: products,
@@ -41,12 +41,14 @@ exports.getProducts = (req, res, next) => {
     })
     .catch(err => console.log(err));
 };
+
+
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect('/');
   }
-  const prodId = req.params.productId;
+const prodId = req.params.productId;
  Product.findById(prodId)
     // Product.findById(prodId)
     .then(product => {
@@ -71,9 +73,14 @@ exports.postEditProduct = (req, res, next) => {
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
 
-      const product = new Product(updatedTitle,updatedPrice,updatedDesc,updatedImageUrl,new ObjectId(prodId));
+  Product.findById(prodId).then(product=>{
+    product.title = updatedTitle;
+    product.price = updatedPrice;
+    product.description = updatedDesc;
+    product.imageUrl = updatedImageUrl;
 
-  product.save()
+    return product.save();
+  })
     .then(result => {
       console.log('UPDATED PRODUCT!');
       res.redirect('/admin/products');
@@ -84,7 +91,7 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId)
+  Product.findByIdAndRemove(prodId)
     .then(result => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
